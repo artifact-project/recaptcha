@@ -63,8 +63,7 @@ import {
 	renderReCaptchaWidget,
 } from '@artifact-project/recaptcha';
 
-// https://developers.google.com/recaptcha/docs/language
-installReCaptchaSDK('ru').then(() => {
+installReCaptchaSDK().then(() => {
 	console.log('reCAPTCHA SDK —> loaded');
 });
 

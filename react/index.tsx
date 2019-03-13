@@ -42,7 +42,7 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 	constructor(props: ReCaptchaProps, context: object) {
 		super(props, context);
 
-		canUseDOM && installReCaptchaSDK(props.lang).then(() => {
+		canUseDOM && installReCaptchaSDK().then(() => {
 			if (!this._unmounted) {
 				setTimeout(() => {
 					if (!this._unmounted) {

@@ -18,7 +18,9 @@ export type ReCaptchaWidgetCallbacks = {
 	'error-callback': (error: any) => void;
 }
 
-export type ReCaptchaWidgetOptions = ReCaptchaWidgetParams & ReCaptchaWidgetCallbacks;
+export type ReCaptchaWidgetOptions = ReCaptchaWidgetParams & ReCaptchaWidgetCallbacks & {
+	hl?: ReCaptchaLanguageCodes;
+};
 
 export type ReCaptchaWidget = {
 	id: string;
@@ -48,36 +50,28 @@ const defaultParams: Partial<ReCaptchaWidgetParams> = {
 	badge: 'bottomright',
 };
 
-let gid = 0;
-let promisesQueue = Promise.resolve<ReCaptchaSDK>(null as ReCaptchaSDK);
-const promises = {} as {
-	[lang:string]: Promise<ReCaptchaSDK>;
-};
+let installPromise: Promise<ReCaptchaSDK>;
 
 function getPromise(
-	lang: string,
 	factory: (
 		resolve: (sdk: ReCaptchaSDK) => void,
 		reject: (reason: any) => void,
 	) => void,
 ) {
-	if (!promises.hasOwnProperty(lang)) {
-		const task = () => new Promise<ReCaptchaSDK>(factory);
-		promisesQueue = promisesQueue.then(task, task)
-		promises[lang] = promisesQueue;
+	if (!installPromise) {
+		installPromise = new Promise<ReCaptchaSDK>(factory);
 	}
 
-	return promises[lang];
+	return installPromise;
 }
 
-export function installReCaptchaSDK(lang: ReCaptchaLang = defaultParams.lang) {
-	return getPromise(lang, (resolve, reject) => {
-		const expando = `__recaptcha_${Date.now()}_${++gid}`;
+export function installReCaptchaSDK() {
+	return getPromise((resolve, reject) => {
+		const expando = `__recaptcha_${Date.now()}`;
 		const head = document.getElementsByTagName('head')[0];
 		const script = document.createElement('script');
-		const src = `https://www.google.com/recaptcha/api.js?hl=${reLang(lang)}&onload=${expando}&render=explicit`;
+		const src = `https://www.google.com/recaptcha/api.js?onload=${expando}&render=explicit`;
 
-		console.log('load:', src);
 		window.grecaptcha = undefined;
 
 		script.type = 'text/javascript';
@@ -91,7 +85,6 @@ export function installReCaptchaSDK(lang: ReCaptchaLang = defaultParams.lang) {
 		head.appendChild(script);
 
 		(window as any)[expando] = () => {
-			console.log('lang:', lang, window.grecaptcha);
 			resolve(window.grecaptcha);
 			window.grecaptcha = undefined;
 			(window as any)[expando] = null;
@@ -133,7 +126,7 @@ export function renderReCaptchaWidget(cfg: {
 		...cfg.params,
 	};
 
-	installReCaptchaSDK(widgetParams.lang)
+	installReCaptchaSDK()
 		.then((recaptcha) => {
 			if (disposed) {
 				return;
@@ -141,6 +134,7 @@ export function renderReCaptchaWidget(cfg: {
 
 			id = recaptcha.render(cfg.el, {
 				...widgetParams,
+				hl: reLang(cfg.params.lang),
 
 				callback() {
 					code = recaptcha.getResponse(id);
