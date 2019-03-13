@@ -8,7 +8,7 @@ import {
 	ReCaptchaContextMock,
 } from '../react';
 
-const V2_KEY = '6LeIYGQUAAAAAF_qWAw_E5VQdLHE29V-RYtN2HQv';
+const V2_KEY = '6LdfVpcUAAAAAJ9h8NiRbklJWcGF1akc5orZU4I_';
 const V2_INVISIBLE_KEY = '6LehTZcUAAAAAAaj7CjzWJ2wDRSS8eXN6km6FSkz'
 
 const ReCaptcha = (props: Partial<ReCaptchaProps> = {}) => <BaseReCaptcha
