@@ -10,5 +10,7 @@ module.exports = (storybookBaseConfig) => {
 		devtool: 'cheap-eval-source-map', // enum
 	});
 
+	config.output.filename = '[name].bundle.js?[hash]';
+
 	return config;
 };
