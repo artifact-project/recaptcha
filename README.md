@@ -13,6 +13,9 @@ npm i --save-dev @artifact-project/recaptcha
  - API 🛠
  - Multi language 🇷🇺🇺🇸🇨🇳
  - Support mock for testing 🔬
+ - React component
+   - Server side render
+   - Dynamic properties
 
 ---
 

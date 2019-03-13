@@ -7,6 +7,7 @@ import {
 	ReCaptchaProps,
 	ReCaptchaContextMock,
 } from '../react';
+import { ReCaptchaLang } from '../src/api/api';
 
 const V2_KEY = '6LdfVpcUAAAAAJ9h8NiRbklJWcGF1akc5orZU4I_';
 const V2_INVISIBLE_KEY = '6LehTZcUAAAAAAaj7CjzWJ2wDRSS8eXN6km6FSkz'
@@ -60,6 +61,15 @@ storiesOf('React', module)
 			<ReCaptcha lang="zh-HK" />
 		</div>
 	)
+	.add('switch language', () =>
+		<State value={{lang: 'en' as ReCaptchaLang}}>{({lang}, setState) => <>
+			<h2>lang: {lang}</h2>
+			<div><ReCaptcha lang={lang} /></div>
+			<button onClick={() => setState({lang: lang == 'ru' ? 'en' : 'ru'})}>
+				switch to {lang == 'ru' ? 'en' : 'ru'}
+			</button>
+		</>}</State>
+	)
 	.add('testing (mock)', () =>
 		<ReCaptchaContextMock.Provider value={{code: '123', ctrlProps: {'data-qa': 're-btn'}}}>
 			<ReCaptcha
@@ -69,4 +79,21 @@ storiesOf('React', module)
 			/>
 		</ReCaptchaContextMock.Provider>
 	)
+	.add('error: sitekey', () =>
+		<State value={{key: 'XXX'}}>{({key}, setState) => <>
+			<h2>sitekey: {key}</h2>
+			<div><ReCaptcha sitekey={key} onError={action('error')} /></div>
+			<button onClick={() => setState({key: V2_KEY})}>Fix</button>
+		</>}</State>
+	)
 ;
+
+function State<S extends object>(
+	props: {
+		value: S;
+		children: (state: S, setState: (state: S) => void) => React.ReactElement;
+	},
+) {
+	const [state, setState] = React.useState(props.value);
+	return props.children(state, setState);
+}

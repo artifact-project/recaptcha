@@ -54,8 +54,24 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 		});
 	}
 
-	_updRefHost = (el: HTMLElement) => {
+	private _reset() {
+		if (this._widget) {
+			this._widget.reset();
+			this._widget.dispose();
+		}
+
+		this._hostRef = null;
+		this._widget = null;
+	}
+
+	private _updRefHost = (el: HTMLElement) => {
 		if (this._hostRef !== el && canUseDOM) {
+			this._reset();
+
+			if (!el) {
+				return;
+			}
+
 			this._hostRef = el;
 
 			const { props } = this;
@@ -88,13 +104,6 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 	}
 
 	componentWillUnmount() {
-		if (this._widget) {
-			this._widget.reset();
-			this._widget.dispose();
-		}
-
-		this._hostRef = null;
-		this._widget = null;
 		this._unmounted = true;
 	}
 
@@ -130,12 +139,28 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 					}
 
 					return (
-						<div ref={this._updRefHost} className={hostClassName}/>
+						<div
+							key={getKey(this.props)}
+							ref={this._updRefHost}
+							className={hostClassName}
+						/>
 					);
 				}
 			}}</ReCaptchaContextMock.Consumer>
 		);
 	}
+}
+
+function getKey(props: ReCaptchaProps) {
+	return [
+		props.sitekey,
+		props.tabIndex,
+		props.lang,
+		props.type,
+		props.theme,
+		props.size,
+		props.badge,
+	].join('-');
 }
 
 export {
