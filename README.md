@@ -68,7 +68,7 @@ renderReCaptchaWidget({ ... }).ready.then(widget => {
 ### Testing / Mock
 
 #### React component
-[See example](https://artifact-project.github.io/recaptcha/?path=/story/react--testing-mock])
+[See example](https://artifact-project.github.io/recaptcha/?path=/story/react--testing-mock)
 
 ```tsx
 import { ReCaptcha, ReCaptchaContextMock } from '@artifact-project/recaptcha/react';
