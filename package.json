@@ -1,6 +1,6 @@
 {
   "name": "@artifact-project/recaptcha",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "reCAPTCHA API & Components",
   "main": "index.ts",
   "scripts": {
@@ -22,8 +22,8 @@
   "files": [
     "*.js",
     "*.d.ts",
-    "react/*/*.js",
-    "react/*/*.d.ts",
+    "react/*.js",
+    "react/*.d.ts",
     "src/*/*.js",
     "src/*/*.d.ts"
   ],
