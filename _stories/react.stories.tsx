@@ -17,7 +17,7 @@ const ReCaptcha = (props: Partial<ReCaptchaProps> = {}) => <BaseReCaptcha
 	{...props}
 />;
 
-storiesOf('ReCaptcha', module)
+storiesOf('React', module)
 	.add('theme: light (default)', () => <ReCaptcha/>)
 	.add('theme: dark', () => <ReCaptcha theme="dark"/>)
 	.add('loading', () => <ReCaptcha

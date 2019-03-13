@@ -1,8 +1,9 @@
 import * as React from 'react';
 
 import {
-	installSDK,
-	renderWidget,
+	installReCaptchaSDK,
+	renderReCaptchaWidget,
+
 	ReCaptchaWidgetParams,
 	ReCaptchaWidget,
 } from '../src/api/api';
@@ -36,7 +37,7 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 	constructor(props: ReCaptchaProps, context: object) {
 		super(props, context);
 
-		installSDK().then(() => {
+		installReCaptchaSDK().then(() => {
 			if (!this._unmounted) {
 				setTimeout(() => {
 					if (!this._unmounted) {
@@ -59,7 +60,7 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 				onError,
 			} = props;
 
-			this._widget = renderWidget({
+			this._widget = renderReCaptchaWidget({
 				el,
 
 				params: {

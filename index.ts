@@ -1,6 +1,6 @@
 export {
-	installSDK,
-	renderWidget,
+	installReCaptchaSDK,
+	renderReCaptchaWidget,
 
 	RecaptchaSDK,
 	ReCaptchaWidget,

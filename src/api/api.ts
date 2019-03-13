@@ -16,6 +16,8 @@ export type ReCaptchaWidgetCallbacks = {
 export type ReCaptchaWidgetOptions = ReCaptchaWidgetParams & ReCaptchaWidgetCallbacks;
 
 export type ReCaptchaWidget = {
+	id: string;
+	ready: Promise<ReCaptchaWidget>;
 	getResponse(): string;
 	reset(): void;
 	dispose(): void;
@@ -40,10 +42,11 @@ const defaultParams: Partial<ReCaptchaWidgetParams> = {
 	badge: 'bottomright',
 };
 
+let _interactive = false;
 let _resolve: (sdk: RecaptchaSDK) => void;
 let _reject: (err: Error) => void;
 
-const ready = new Promise<RecaptchaSDK>((resolve, reject) => {
+const _ready = new Promise<RecaptchaSDK>((resolve, reject) => {
 	_resolve = resolve;
 	_reject = reject;
 });
@@ -51,7 +54,13 @@ const expando = '__recaptcha_' + Date.now();
 
 (window as any)[expando] = () => _resolve(window.grecaptcha);
 
-export function installSDK(lang?: string) {
+export function installReCaptchaSDK(lang?: string) {
+	if (_interactive) {
+		return _ready;
+	}
+
+	_interactive = true;
+
 	const head = document.getElementsByTagName('head')[0];
 	const script = document.createElement('script');
 	let src = 'https://www.google.com/recaptcha/api.js?onload=' + expando + '&render=explicit';
@@ -74,10 +83,10 @@ export function installSDK(lang?: string) {
 		!window.grecaptcha && _reject(new Error('Install Failed: timeout'));
 	}, 30000);
 
-	return ready;
+	return _ready;
 }
 
-export function renderWidget(cfg: {
+export function renderReCaptchaWidget(cfg: {
 	el: HTMLElement;
 	params: ReCaptchaWidgetParams;
 	handle: (type: 'change' | 'expired' | 'error', code: string | null, error: any) => void;
@@ -85,7 +94,16 @@ export function renderWidget(cfg: {
 	let id: string = null;
 	let code: string = null;
 	let disposed = false;
+	let widgetResolve: (w: ReCaptchaWidget) => void;
+	let widgetReject: (err: Error) => void;
+	let widgetReady = new Promise<ReCaptchaWidget>((resolve, reject) => {
+		widgetResolve = resolve;
+		widgetReject = reject;
+	});
+
 	const widget: ReCaptchaWidget = {
+		id: null,
+		ready: widgetReady,
 		getResponse: () => code,
 		reset: () => {},
 		dispose: () => {
@@ -93,35 +111,41 @@ export function renderWidget(cfg: {
 		},
 	};
 
-	ready.then((recaptcha) => {
-		if (disposed) {
-			return;
-		}
+	installReCaptchaSDK()
+		.then((recaptcha) => {
+			if (disposed) {
+				return;
+			}
 
-		id = recaptcha.render(cfg.el, {
-			...defaultParams,
-			...cfg.params,
+			id = recaptcha.render(cfg.el, {
+				...defaultParams,
+				...cfg.params,
 
-			callback() {
-				code = recaptcha.getResponse(id);
-				cfg.handle('change', code, null);
-			},
+				callback() {
+					code = recaptcha.getResponse(id);
+					cfg.handle('change', code, null);
+				},
 
-			'expired-callback'() {
-				code = null;
-				cfg.handle('change', code, null);
-			},
+				'expired-callback'() {
+					code = null;
+					cfg.handle('change', code, null);
+				},
 
-			'error-callback'(err: any) {
-				code = null;
-				cfg.handle('change', null, err);
-			},
-		});
+				'error-callback'(err: any) {
+					code = null;
+					cfg.handle('change', null, err);
+				},
+			});
 
-		widget.reset = () => {
-			recaptcha.reset(id);
-		};
-	});
+			widget.id = id;
+			widget.reset = () => {
+				recaptcha.reset(id);
+			};
+
+			widgetResolve(widget);
+		})
+		.catch(widgetReject)
+	;
 
 	return widget;
 }
