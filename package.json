@@ -1,0 +1,53 @@
+{
+  "name": "@artifact-project/recaptcha",
+  "version": "0.1.0",
+  "description": "reCAPTCHA API & Components",
+  "main": "index.ts",
+  "scripts": {
+    "test": "jest --coverage",
+    "start": "npm run storybook",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:artifact-project/recaptcha.git"
+  },
+  "keywords": [
+    "recaptcha",
+    "api",
+    "components",
+    "react"
+  ],
+  "files": [
+    "*.js",
+    "*.d.ts",
+    "react/*/*.js",
+    "react/*/*.d.ts",
+    "src/*/*.js",
+    "src/*/*.d.ts"
+  ],
+  "author": "RubaXa <trash@rubaxa.org>",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.3.4",
+    "@storybook/addon-actions": "^5.0.1",
+    "@storybook/addon-links": "^5.0.1",
+    "@storybook/addons": "^5.0.1",
+    "@storybook/react": "^5.0.1",
+    "@types/jest": "^24.0.5",
+    "@types/node": "^11.11.3",
+    "@types/react": "^16.8.3",
+    "awesome-typescript-loader": "^5.2.1",
+    "babel-loader": "^8.0.5",
+    "jest": "^24.1.0",
+    "react": "^16.8.2",
+    "ts-jest": "^23.10.5",
+    "typescript": "^3.3.3"
+  },
+  "peerDependencies": {
+    "@types/react": ">=16",
+    "react": ">=16"
+  },
+  "dependencies": {}
+}
