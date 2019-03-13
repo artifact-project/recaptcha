@@ -1,6 +1,6 @@
 {
   "name": "@artifact-project/recaptcha",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "reCAPTCHA API & Components",
   "main": "index.ts",
   "scripts": {
