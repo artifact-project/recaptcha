@@ -84,7 +84,7 @@ export function installReCaptchaSDK(lang: ReCaptchaLang = defaultParams.lang) {
 		script.async = true;
 		script.defer = true;
 		script.onerror = () => {
-			reject(new Error('Install Failed: net error'));
+			reject(new Error('[recaptcha] Install Failed: net error'));
 		};
 		script.src = src;
 
@@ -98,7 +98,7 @@ export function installReCaptchaSDK(lang: ReCaptchaLang = defaultParams.lang) {
 		};
 
 		setTimeout(() => {
-			reject(new Error('Install Failed: timeout'));
+			reject(new Error('[recaptcha] Install Failed: timeout'));
 			(window as any)[expando] = null;
 		}, 30000);
 	});
@@ -149,12 +149,12 @@ export function renderReCaptchaWidget(cfg: {
 
 				'expired-callback'() {
 					code = null;
-					cfg.handle('change', code, null);
+					cfg.handle('expired', code, null);
 				},
 
 				'error-callback'(err: any) {
 					code = null;
-					cfg.handle('change', null, err);
+					cfg.handle('error', null, err);
 				},
 			});
 
@@ -165,7 +165,10 @@ export function renderReCaptchaWidget(cfg: {
 
 			widgetResolve(widget);
 		})
-		.catch(widgetReject)
+		.catch((reason) => {
+			cfg.handle('error', null, reason);
+			widgetReject(reason);
+		})
 	;
 
 	return widget;
