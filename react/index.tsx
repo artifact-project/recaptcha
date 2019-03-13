@@ -24,6 +24,11 @@ const ReCaptchaContextMock = React.createContext<{
 	okProps?: {[key:string]: string;};
 }>(null);
 
+const canUseDOM = !!(
+	(typeof window !== 'undefined' &&
+	window.document && window.document.createElement)
+);
+
 class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 	private _hostRef: HTMLElement;
 	private _widget: ReCaptchaWidget;
@@ -37,7 +42,7 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 	constructor(props: ReCaptchaProps, context: object) {
 		super(props, context);
 
-		installReCaptchaSDK().then(() => {
+		canUseDOM && installReCaptchaSDK().then(() => {
 			if (!this._unmounted) {
 				setTimeout(() => {
 					if (!this._unmounted) {
@@ -50,7 +55,7 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 	}
 
 	_updRefHost = (el: HTMLElement) => {
-		if (this._hostRef !== el) {
+		if (this._hostRef !== el && canUseDOM) {
 			this._hostRef = el;
 
 			const { props } = this;
