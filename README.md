@@ -1,6 +1,6 @@
 reCAPTCHA
 ---------
-[reCAPTCHA API](https://developers.google.com/recaptcha/) & Components
+[reCAPTCHA API](https://developers.google.com/recaptcha/) & [Components](https://artifact-project.github.io/recaptcha/)
 
 ```sh
 npm i --save @artifact-project/recaptcha
