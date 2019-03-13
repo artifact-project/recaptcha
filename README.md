@@ -7,7 +7,7 @@ npm i --save @artifact-project/recaptcha
 ```
 
 ### Usage
-[See examples](https://artifact-project.github.io/recaptcha/)]
+[See examples](https://artifact-project.github.io/recaptcha/)
 
 
 ```tsx
