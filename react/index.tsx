@@ -9,6 +9,7 @@ import {
 } from '../src/api/api';
 
 interface ReCaptchaProps extends ReCaptchaWidgetParams {
+	lang?: string;
 	loading?: React.ReactNode;
 	hostClassName?: string;
 	delayBeforeReady?: number;
@@ -42,7 +43,7 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 	constructor(props: ReCaptchaProps, context: object) {
 		super(props, context);
 
-		canUseDOM && installReCaptchaSDK().then(() => {
+		canUseDOM && installReCaptchaSDK(props.lang).then(() => {
 			if (!this._unmounted) {
 				setTimeout(() => {
 					if (!this._unmounted) {
@@ -70,6 +71,7 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 
 				params: {
 					sitekey: props.sitekey,
+					lang: props.lang,
 					type: props.type,
 					tabIndex: props.tabIndex,
 					theme: props.theme,

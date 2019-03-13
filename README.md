@@ -8,6 +8,14 @@ npm i --save-dev @artifact-project/recaptcha
 
 ---
 
+### Features
+
+ - API 🛠
+ - Multi language 🇷🇺🇺🇸🇨🇳
+ - Support mock for testing 🔬
+
+---
+
 ### Usage
 [See examples](https://artifact-project.github.io/recaptcha/)
 
@@ -55,7 +63,8 @@ import {
 	renderReCaptchaWidget,
 } from '@artifact-project/recaptcha';
 
-installReCaptchaSDK().then(() => {
+// https://developers.google.com/recaptcha/docs/language
+installReCaptchaSDK('ru').then(() => {
 	console.log('reCAPTCHA SDK —> loaded');
 });
 

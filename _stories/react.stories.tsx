@@ -48,6 +48,18 @@ storiesOf('React', module)
 		size="invisible"
 		sitekey={V2_INVISIBLE_KEY}
 	/>)
+	.add('multi language', () =>
+		<div>
+			<h2>English</h2>
+			<ReCaptcha lang="en" />
+
+			<h2>Russian</h2>
+			<ReCaptcha lang="ru" />
+
+			<h2>Chinese (Hong Kong)	</h2>
+			<ReCaptcha lang="zh-HK" />
+		</div>
+	)
 	.add('testing (mock)', () =>
 		<ReCaptchaContextMock.Provider value={{code: '123', ctrlProps: {'data-qa': 're-btn'}}}>
 			<ReCaptcha

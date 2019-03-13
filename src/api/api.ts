@@ -1,6 +1,7 @@
 export type ReCaptchaWidgetParams = {
 	sitekey: string;
 	tabIndex?: number;
+	lang?: string;
 	type?: 'image' | 'audio';
 	theme?: 'dark' | 'light';
 	size?: 'compact' | 'normal' | 'invisible';
@@ -23,7 +24,7 @@ export type ReCaptchaWidget = {
 	dispose(): void;
 }
 
-export type RecaptchaSDK = {
+export type ReCaptchaSDK = {
 	render(host: HTMLElement, options: ReCaptchaWidgetOptions): string;
 	getResponse(id: string): string;
 	reset(id: string): void;
@@ -31,59 +32,72 @@ export type RecaptchaSDK = {
 
 declare global {
 	interface Window {
-		grecaptcha: RecaptchaSDK;
+		grecaptcha: ReCaptchaSDK;
 	}
 }
 
 const defaultParams: Partial<ReCaptchaWidgetParams> = {
+	lang: 'en',
 	type: 'image',
 	theme: 'light',
 	size: 'normal',
 	badge: 'bottomright',
 };
 
-let _interactive = false;
-let _resolve: (sdk: RecaptchaSDK) => void;
-let _reject: (err: Error) => void;
+let gid = 0;
+let promisesQueue = Promise.resolve<ReCaptchaSDK>(null as ReCaptchaSDK);
+const promises = {} as {
+	[lang:string]: Promise<ReCaptchaSDK>;
+};
 
-const _ready = new Promise<RecaptchaSDK>((resolve, reject) => {
-	_resolve = resolve;
-	_reject = reject;
-});
-const expando = '__recaptcha_' + Date.now();
-
-(window as any)[expando] = () => _resolve(window.grecaptcha);
-
-export function installReCaptchaSDK(lang?: string) {
-	if (_interactive) {
-		return _ready;
+function getPromise(
+	lang: string,
+	factory: (
+		resolve: (sdk: ReCaptchaSDK) => void,
+		reject: (reason: any) => void,
+	) => void,
+) {
+	if (!promises.hasOwnProperty(lang)) {
+		const task = () => new Promise<ReCaptchaSDK>(factory);
+		promisesQueue = promisesQueue.then(task, task)
+		promises[lang] = promisesQueue;
 	}
 
-	_interactive = true;
+	return promises[lang];
+}
 
-	const head = document.getElementsByTagName('head')[0];
-	const script = document.createElement('script');
-	let src = 'https://www.google.com/recaptcha/api.js?onload=' + expando + '&render=explicit';
+export function installReCaptchaSDK(lang: string = defaultParams.lang) {
+	return getPromise(lang, (resolve, reject) => {
+		const expando = `__recaptcha_${Date.now()}_${++gid}`;
+		const head = document.getElementsByTagName('head')[0];
+		const script = document.createElement('script');
+		const src = `https://www.google.com/recaptcha/api.js?hl=${lang}&onload=${expando}&render=explicit`;
 
-	if (lang) {
-		src += '&hl=' + lang;
-	}
+		console.log('load:', src);
+		window.grecaptcha = undefined;
 
-	script.type = 'text/javascript';
-	script.async = true;
-	script.defer = true;
-	script.onerror = () => {
-		_reject(new Error('Install Failed: net error'));
-	};
+		script.type = 'text/javascript';
+		script.async = true;
+		script.defer = true;
+		script.onerror = () => {
+			reject(new Error('Install Failed: net error'));
+		};
+		script.src = src;
 
-	script.src = src;
-	head.appendChild(script);
+		head.appendChild(script);
 
-	setTimeout(() => {
-		!window.grecaptcha && _reject(new Error('Install Failed: timeout'));
-	}, 30000);
+		(window as any)[expando] = () => {
+			console.log('lang:', lang, window.grecaptcha);
+			resolve(window.grecaptcha);
+			window.grecaptcha = undefined;
+			(window as any)[expando] = null;
+		};
 
-	return _ready;
+		setTimeout(() => {
+			reject(new Error('Install Failed: timeout'));
+			(window as any)[expando] = null;
+		}, 30000);
+	});
 }
 
 export function renderReCaptchaWidget(cfg: {
@@ -110,16 +124,19 @@ export function renderReCaptchaWidget(cfg: {
 			disposed = true;
 		},
 	};
+	const widgetParams = {
+		...defaultParams,
+		...cfg.params,
+	};
 
-	installReCaptchaSDK()
+	installReCaptchaSDK(widgetParams.lang)
 		.then((recaptcha) => {
 			if (disposed) {
 				return;
 			}
 
 			id = recaptcha.render(cfg.el, {
-				...defaultParams,
-				...cfg.params,
+				...widgetParams,
 
 				callback() {
 					code = recaptcha.getResponse(id);

@@ -2,7 +2,7 @@ export {
 	installReCaptchaSDK,
 	renderReCaptchaWidget,
 
-	RecaptchaSDK,
+	ReCaptchaSDK,
 	ReCaptchaWidget,
 	ReCaptchaWidgetOptions,
 } from './src/api/api';
