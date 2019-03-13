@@ -9,7 +9,6 @@ import {
 } from '../src/api/api';
 
 interface ReCaptchaProps extends ReCaptchaWidgetParams {
-	lang?: string;
 	loading?: React.ReactNode;
 	hostClassName?: string;
 	delayBeforeReady?: number;

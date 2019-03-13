@@ -5,4 +5,5 @@ export {
 	ReCaptchaSDK,
 	ReCaptchaWidget,
 	ReCaptchaWidgetOptions,
+	ReCaptchaLang,
 } from './src/api/api';

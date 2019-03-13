@@ -1,7 +1,11 @@
+import { ReCaptchaLanguageCodes, LanguageLocale, reLang } from './language';
+
+export type ReCaptchaLang = ReCaptchaLanguageCodes | LanguageLocale;
+
 export type ReCaptchaWidgetParams = {
 	sitekey: string;
 	tabIndex?: number;
-	lang?: string;
+	lang?: ReCaptchaLang;
 	type?: 'image' | 'audio';
 	theme?: 'dark' | 'light';
 	size?: 'compact' | 'normal' | 'invisible';
@@ -66,12 +70,12 @@ function getPromise(
 	return promises[lang];
 }
 
-export function installReCaptchaSDK(lang: string = defaultParams.lang) {
+export function installReCaptchaSDK(lang: ReCaptchaLang = defaultParams.lang) {
 	return getPromise(lang, (resolve, reject) => {
 		const expando = `__recaptcha_${Date.now()}_${++gid}`;
 		const head = document.getElementsByTagName('head')[0];
 		const script = document.createElement('script');
-		const src = `https://www.google.com/recaptcha/api.js?hl=${lang}&onload=${expando}&render=explicit`;
+		const src = `https://www.google.com/recaptcha/api.js?hl=${reLang(lang)}&onload=${expando}&render=explicit`;
 
 		console.log('load:', src);
 		window.grecaptcha = undefined;
