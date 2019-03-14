@@ -86,6 +86,12 @@ storiesOf('React', module)
 			<button onClick={() => setState({key: V2_KEY})}>Fix</button>
 		</>}</State>
 	)
+	.add('mount/unmount', () =>
+		<State value={{mount: true}}>{({mount}, setState) => <>
+			<button onClick={() => setState({mount: !mount})}>{!mount ? 'mount' : 'unmount'}</button>
+			<div>{mount && <ReCaptcha />}</div>
+		</>}</State>
+	)
 ;
 
 function State<S extends object>(

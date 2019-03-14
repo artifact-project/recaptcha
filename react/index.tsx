@@ -3,20 +3,9 @@ import * as React from 'react';
 import {
 	installReCaptchaSDK,
 	renderReCaptchaWidget,
-
-	ReCaptchaWidgetParams,
 	ReCaptchaWidget,
 } from '../src/api/api';
-
-interface ReCaptchaProps extends ReCaptchaWidgetParams {
-	loading?: React.ReactNode;
-	hostClassName?: string;
-	delayBeforeReady?: number;
-	onReady?: () => void;
-	onChange?: (code: string) => void;
-	onExpired?: () => void;
-	onError?: (err: Error) => void;
-}
+import { getWidgetParams, ReCaptchaProps } from '../src/utils/types';
 
 const ReCaptchaContextMock = React.createContext<{
 	code: string;
@@ -83,17 +72,7 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 
 			this._widget = renderReCaptchaWidget({
 				el,
-
-				params: {
-					sitekey: props.sitekey,
-					lang: props.lang,
-					type: props.type,
-					tabIndex: props.tabIndex,
-					theme: props.theme,
-					size: props.size,
-					badge: props.badge,
-				},
-
+				params: getWidgetParams(props),
 				handle: (type, code, err) => {
 					onChange && onChange(code);
 					(type === 'expired') && onExpired && onExpired();
