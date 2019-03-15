@@ -1,13 +1,14 @@
 {
   "name": "@artifact-project/recaptcha",
-  "version": "0.1.0",
+  "version": "0.5.0",
   "description": "reCAPTCHA API & Components",
   "main": "index.ts",
   "scripts": {
     "test": "echo '\\033[0;31m @todo: add jest tests\n \\033[0m' && exit 1;",
     "start": "npm run storybook",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook -c .storybook -o ./"
+    "build-storybook": "build-storybook -c .storybook -o ./",
+    "prepublishOnly": "tsc"
   },
   "repository": {
     "type": "git",
@@ -17,15 +18,22 @@
     "recaptcha",
     "api",
     "components",
-    "react"
+    "react",
+    "vue",
+    "web-component"
   ],
   "files": [
     "*.js",
     "*.d.ts",
-    "react/*/*.js",
-    "react/*/*.d.ts",
-    "src/*/*.js",
-    "src/*/*.d.ts"
+    "react/*.js",
+    "react/*.d.ts",
+    "vue/*.js",
+    "vue/*.vue",
+    "vue/*.d.ts",
+    "web-component/*.js",
+    "web-component/*.d.ts",
+    "src/*.js",
+    "src/*.d.ts"
   ],
   "author": "RubaXa <trash@rubaxa.org>",
   "license": "MIT",
@@ -43,11 +51,15 @@
     "jest": "^24.1.0",
     "react": "^16.8.2",
     "ts-jest": "^23.10.5",
-    "typescript": "^3.3.3"
+    "typescript": "^3.3.3",
+    "vue-loader": "^15.7.0",
+    "vue-template-compiler": "^2.6.9"
   },
   "peerDependencies": {
     "@types/react": ">=16",
     "react": ">=16"
   },
-  "dependencies": {}
+  "dependencies": {
+    "vue": "^2.6.9"
+  }
 }

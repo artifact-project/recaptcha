@@ -3,26 +3,25 @@ import * as React from 'react';
 import {
 	installReCaptchaSDK,
 	renderReCaptchaWidget,
-
-	ReCaptchaWidgetParams,
 	ReCaptchaWidget,
-} from '../src/api/api';
+} from '../src/api';
+import { getWidgetParams, ReCaptchaProps, getWidgetKey } from '../src/utils';
 
-interface ReCaptchaProps extends ReCaptchaWidgetParams {
-	loading?: React.ReactNode;
-	hostClassName?: string;
-	delayBeforeReady?: number;
-	onReady?: () => void;
-	onChange?: (code: string) => void;
-	onExpired?: () => void;
-	onError?: (err: Error) => void;
-}
+const defaultStyle = {
+	display: 'inline-block',
+};
 
 const ReCaptchaContextMock = React.createContext<{
 	code: string;
 	ctrlProps: {[key:string]: string;};
+	hostProps?: {[key:string]: string;};
 	okProps?: {[key:string]: string;};
 }>(null);
+
+const canUseDOM = !!(
+	(typeof window !== 'undefined' &&
+	window.document && window.document.createElement)
+);
 
 class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 	private _hostRef: HTMLElement;
@@ -37,7 +36,7 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 	constructor(props: ReCaptchaProps, context: object) {
 		super(props, context);
 
-		installReCaptchaSDK().then(() => {
+		canUseDOM && installReCaptchaSDK().then(() => {
 			if (!this._unmounted) {
 				setTimeout(() => {
 					if (!this._unmounted) {
@@ -49,8 +48,24 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 		});
 	}
 
-	_updRefHost = (el: HTMLElement) => {
-		if (this._hostRef !== el) {
+	private _reset() {
+		if (this._widget) {
+			this._widget.reset();
+			this._widget.dispose();
+		}
+
+		this._hostRef = null;
+		this._widget = null;
+	}
+
+	private _updRefHost = (el: HTMLElement) => {
+		if (this._hostRef !== el && canUseDOM) {
+			this._reset();
+
+			if (!el) {
+				return;
+			}
+
 			this._hostRef = el;
 
 			const { props } = this;
@@ -62,16 +77,7 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 
 			this._widget = renderReCaptchaWidget({
 				el,
-
-				params: {
-					sitekey: props.sitekey,
-					type: props.type,
-					tabIndex: props.tabIndex,
-					theme: props.theme,
-					size: props.size,
-					badge: props.badge,
-				},
-
+				params: getWidgetParams(props),
 				handle: (type, code, err) => {
 					onChange && onChange(code);
 					(type === 'expired') && onExpired && onExpired();
@@ -82,19 +88,13 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 	}
 
 	componentWillUnmount() {
-		if (this._widget) {
-			this._widget.reset();
-			this._widget.dispose();
-		}
-
-		this._hostRef = null;
-		this._widget = null;
 		this._unmounted = true;
 	}
 
 	render() {
 		const {
 			loading,
+			hostStyle = defaultStyle,
 			hostClassName,
 		} = this.props;
 
@@ -102,7 +102,11 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 			<ReCaptchaContextMock.Consumer>{(mock) => {
 				if (mock) {
 					return (
-						<div className={hostClassName}>
+						<div
+							style={hostStyle}
+							className={hostClassName}
+							{...Object(mock.hostProps)}
+						>
 							{!this.state.code
 								? <button
 									style={{fontSize: '150%'}}
@@ -124,7 +128,12 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 					}
 
 					return (
-						<div ref={this._updRefHost} className={hostClassName}/>
+						<div
+							key={getWidgetKey(this.props)}
+							ref={this._updRefHost}
+							style={hostStyle}
+							className={hostClassName}
+						/>
 					);
 				}
 			}}</ReCaptchaContextMock.Consumer>

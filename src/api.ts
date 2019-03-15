@@ -1,6 +1,11 @@
+import { ReCaptchaLanguageCodes, LanguageLocale, reLang } from './language';
+
+export type ReCaptchaLang = ReCaptchaLanguageCodes | LanguageLocale;
+
 export type ReCaptchaWidgetParams = {
 	sitekey: string;
 	tabIndex?: number;
+	lang?: ReCaptchaLang;
 	type?: 'image' | 'audio';
 	theme?: 'dark' | 'light';
 	size?: 'compact' | 'normal' | 'invisible';
@@ -13,7 +18,9 @@ export type ReCaptchaWidgetCallbacks = {
 	'error-callback': (error: any) => void;
 }
 
-export type ReCaptchaWidgetOptions = ReCaptchaWidgetParams & ReCaptchaWidgetCallbacks;
+export type ReCaptchaWidgetOptions = ReCaptchaWidgetParams & ReCaptchaWidgetCallbacks & {
+	hl?: ReCaptchaLanguageCodes;
+};
 
 export type ReCaptchaWidget = {
 	id: string;
@@ -23,7 +30,7 @@ export type ReCaptchaWidget = {
 	dispose(): void;
 }
 
-export type RecaptchaSDK = {
+export type ReCaptchaSDK = {
 	render(host: HTMLElement, options: ReCaptchaWidgetOptions): string;
 	getResponse(id: string): string;
 	reset(id: string): void;
@@ -31,59 +38,63 @@ export type RecaptchaSDK = {
 
 declare global {
 	interface Window {
-		grecaptcha: RecaptchaSDK;
+		grecaptcha: ReCaptchaSDK;
 	}
 }
 
-const defaultParams: Partial<ReCaptchaWidgetParams> = {
+export const defaultParams: Partial<ReCaptchaWidgetParams> = {
+	lang: 'en',
 	type: 'image',
 	theme: 'light',
 	size: 'normal',
 	badge: 'bottomright',
 };
 
-let _interactive = false;
-let _resolve: (sdk: RecaptchaSDK) => void;
-let _reject: (err: Error) => void;
+let installPromise: Promise<ReCaptchaSDK>;
 
-const _ready = new Promise<RecaptchaSDK>((resolve, reject) => {
-	_resolve = resolve;
-	_reject = reject;
-});
-const expando = '__recaptcha_' + Date.now();
-
-(window as any)[expando] = () => _resolve(window.grecaptcha);
-
-export function installReCaptchaSDK(lang?: string) {
-	if (_interactive) {
-		return _ready;
+function getPromise(
+	factory: (
+		resolve: (sdk: ReCaptchaSDK) => void,
+		reject: (reason: any) => void,
+	) => void,
+) {
+	if (!installPromise) {
+		installPromise = new Promise<ReCaptchaSDK>(factory);
 	}
 
-	_interactive = true;
+	return installPromise;
+}
 
-	const head = document.getElementsByTagName('head')[0];
-	const script = document.createElement('script');
-	let src = 'https://www.google.com/recaptcha/api.js?onload=' + expando + '&render=explicit';
+export function installReCaptchaSDK() {
+	return getPromise((resolve, reject) => {
+		const expando = `__recaptcha_${Date.now()}`;
+		const head = document.getElementsByTagName('head')[0];
+		const script = document.createElement('script');
+		const src = `https://www.google.com/recaptcha/api.js?onload=${expando}&render=explicit`;
 
-	if (lang) {
-		src += '&hl=' + lang;
-	}
+		window.grecaptcha = undefined;
 
-	script.type = 'text/javascript';
-	script.async = true;
-	script.defer = true;
-	script.onerror = () => {
-		_reject(new Error('Install Failed: net error'));
-	};
+		script.type = 'text/javascript';
+		script.async = true;
+		script.defer = true;
+		script.onerror = () => {
+			reject(new Error('[recaptcha] Install Failed: net error'));
+		};
+		script.src = src;
 
-	script.src = src;
-	head.appendChild(script);
+		head.appendChild(script);
 
-	setTimeout(() => {
-		!window.grecaptcha && _reject(new Error('Install Failed: timeout'));
-	}, 30000);
+		(window as any)[expando] = () => {
+			resolve(window.grecaptcha);
+			window.grecaptcha = undefined;
+			(window as any)[expando] = null;
+		};
 
-	return _ready;
+		setTimeout(() => {
+			reject(new Error('[recaptcha] Install Failed: timeout'));
+			(window as any)[expando] = null;
+		}, 30000);
+	});
 }
 
 export function renderReCaptchaWidget(cfg: {
@@ -110,6 +121,10 @@ export function renderReCaptchaWidget(cfg: {
 			disposed = true;
 		},
 	};
+	const widgetParams = {
+		...defaultParams,
+		...cfg.params,
+	};
 
 	installReCaptchaSDK()
 		.then((recaptcha) => {
@@ -118,8 +133,8 @@ export function renderReCaptchaWidget(cfg: {
 			}
 
 			id = recaptcha.render(cfg.el, {
-				...defaultParams,
-				...cfg.params,
+				...widgetParams,
+				hl: reLang(cfg.params.lang),
 
 				callback() {
 					code = recaptcha.getResponse(id);
@@ -128,12 +143,12 @@ export function renderReCaptchaWidget(cfg: {
 
 				'expired-callback'() {
 					code = null;
-					cfg.handle('change', code, null);
+					cfg.handle('expired', code, null);
 				},
 
 				'error-callback'(err: any) {
 					code = null;
-					cfg.handle('change', null, err);
+					cfg.handle('error', null, err);
 				},
 			});
 
@@ -144,7 +159,10 @@ export function renderReCaptchaWidget(cfg: {
 
 			widgetResolve(widget);
 		})
-		.catch(widgetReject)
+		.catch((reason) => {
+			cfg.handle('error', null, reason);
+			widgetReject(reason);
+		})
 	;
 
 	return widget;

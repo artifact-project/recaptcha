@@ -3,8 +3,24 @@ reCAPTCHA
 [reCAPTCHA API](https://developers.google.com/recaptcha/) & [Components](https://artifact-project.github.io/recaptcha/)
 
 ```sh
-npm i --save @artifact-project/recaptcha
+npm i --save-dev @artifact-project/recaptcha
 ```
+
+---
+
+### Features
+
+ - API 🛠
+ - Multi language 🇷🇺🇺🇸🇨🇳
+ - Support mock for testing 🔬
+ - Components
+   - [Vue](https://artifact-project.github.io/recaptcha/?path=/story/vue--default) (in progress)
+   - [WebComponent](https://artifact-project.github.io/recaptcha/?path=/story/webcomponent--default) (in progress)
+   - [React](https://artifact-project.github.io/recaptcha/?path=/story/react--default) (ready to use)
+     - Server side render
+     - Dynamic properties
+
+---
 
 ### Usage
 [See examples](https://artifact-project.github.io/recaptcha/)
@@ -68,7 +84,7 @@ renderReCaptchaWidget({ ... }).ready.then(widget => {
 ### Testing / Mock
 
 #### React component
-[See example](https://artifact-project.github.io/recaptcha/?path=/story/react--testing-mock])
+[See example](https://artifact-project.github.io/recaptcha/?path=/story/react--testing-mock)
 
 ```tsx
 import { ReCaptcha, ReCaptchaContextMock } from '@artifact-project/recaptcha/react';

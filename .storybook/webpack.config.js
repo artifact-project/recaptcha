@@ -11,6 +11,7 @@ module.exports = (storybookBaseConfig) => {
 	});
 
 	config.output.filename = '[name].bundle.js?[hash]';
+	config.plugins = config.plugins.concat(baseConfig.plugins);
 
 	return config;
 };
