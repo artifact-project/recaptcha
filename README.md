@@ -13,9 +13,12 @@ npm i --save-dev @artifact-project/recaptcha
  - API 🛠
  - Multi language 🇷🇺🇺🇸🇨🇳
  - Support mock for testing 🔬
- - React component
-   - Server side render
-   - Dynamic properties
+ - Components
+   - [Vue](https://artifact-project.github.io/recaptcha/?path=/story/vue--default) (in progress)
+   - [WebComponent](https://artifact-project.github.io/recaptcha/?path=/story/webcomponent--default) (in progress)
+   - [React](https://artifact-project.github.io/recaptcha/?path=/story/react--default) (ready to use)
+     - Server side render
+     - Dynamic properties
 
 ---
 

@@ -7,18 +7,22 @@ import {
 	ReCaptchaProps,
 	ReCaptchaContextMock,
 } from '../react';
-import { ReCaptchaLang } from '../src/api/api';
+import { ReCaptchaLang } from '../src/api';
 
 const V2_KEY = '6LdfVpcUAAAAAJ9h8NiRbklJWcGF1akc5orZU4I_';
 const V2_INVISIBLE_KEY = '6LehTZcUAAAAAAaj7CjzWJ2wDRSS8eXN6km6FSkz'
 
 const ReCaptcha = (props: Partial<ReCaptchaProps> = {}) => <BaseReCaptcha
 	sitekey={V2_KEY}
-	onChange={action('code')}
+	onReady={action('ready')}
+	onChange={action('change')}
+	onExpired={action('expired')}
+	onError={action('error')}
 	{...props}
 />;
 
 storiesOf('React', module)
+	.add('default', () => <ReCaptcha/>)
 	.add('theme: light (default)', () => <ReCaptcha/>)
 	.add('theme: dark', () => <ReCaptcha theme="dark"/>)
 	.add('loading', () => <ReCaptcha
@@ -94,7 +98,7 @@ storiesOf('React', module)
 	)
 ;
 
-function State<S extends object>(
+export function State<S extends object>(
 	props: {
 		value: S;
 		children: (state: S, setState: (state: S) => void) => React.ReactElement;

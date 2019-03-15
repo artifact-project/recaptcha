@@ -6,4 +6,4 @@ export {
 	ReCaptchaWidget,
 	ReCaptchaWidgetOptions,
 	ReCaptchaLang,
-} from './src/api/api';
+} from './src/api';

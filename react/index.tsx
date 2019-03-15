@@ -4,12 +4,17 @@ import {
 	installReCaptchaSDK,
 	renderReCaptchaWidget,
 	ReCaptchaWidget,
-} from '../src/api/api';
-import { getWidgetParams, ReCaptchaProps } from '../src/utils/types';
+} from '../src/api';
+import { getWidgetParams, ReCaptchaProps, getWidgetKey } from '../src/utils';
+
+const defaultStyle = {
+	display: 'inline-block',
+};
 
 const ReCaptchaContextMock = React.createContext<{
 	code: string;
 	ctrlProps: {[key:string]: string;};
+	hostProps?: {[key:string]: string;};
 	okProps?: {[key:string]: string;};
 }>(null);
 
@@ -89,6 +94,7 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 	render() {
 		const {
 			loading,
+			hostStyle = defaultStyle,
 			hostClassName,
 		} = this.props;
 
@@ -96,7 +102,11 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 			<ReCaptchaContextMock.Consumer>{(mock) => {
 				if (mock) {
 					return (
-						<div className={hostClassName}>
+						<div
+							style={hostStyle}
+							className={hostClassName}
+							{...Object(mock.hostProps)}
+						>
 							{!this.state.code
 								? <button
 									style={{fontSize: '150%'}}
@@ -119,8 +129,9 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 
 					return (
 						<div
-							key={getKey(this.props)}
+							key={getWidgetKey(this.props)}
 							ref={this._updRefHost}
+							style={hostStyle}
 							className={hostClassName}
 						/>
 					);
@@ -128,18 +139,6 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 			}}</ReCaptchaContextMock.Consumer>
 		);
 	}
-}
-
-function getKey(props: ReCaptchaProps) {
-	return [
-		props.sitekey,
-		props.tabIndex,
-		props.lang,
-		props.type,
-		props.theme,
-		props.size,
-		props.badge,
-	].join('-');
 }
 
 export {

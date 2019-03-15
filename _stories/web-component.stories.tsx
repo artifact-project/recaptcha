@@ -2,10 +2,9 @@ import * as React from 'react';
 import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 
-import { ReCaptchaWidgetParams } from '../src/api/api';
 import { ReCaptcha as CustomReCaptcha } from '../web-component';
 import { ReCaptchaProps } from '../react';
-import { getWidgetParams } from '../src/utils/types';
+import { getWidgetParams } from '../src/utils';
 
 const V2_KEY = '6LdfVpcUAAAAAJ9h8NiRbklJWcGF1akc5orZU4I_';
 

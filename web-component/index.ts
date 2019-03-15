@@ -4,15 +4,14 @@ import {
 
 	ReCaptchaWidgetParams,
 	ReCaptchaWidget,
-} from '../src/api/api';
-import { getWidgetParams } from '../src/utils/types';
+} from '../src/api';
+import { getWidgetParams } from '../src/utils';
 
 
 class ReCaptcha extends HTMLElement implements ReCaptchaWidgetParams {
 	private _unmounted = false;
 	private _ref: HTMLDivElement = null;
 	private _widget: ReCaptchaWidget = null;
-	private _loading: Element = null;
 
 	get sitekey() {
 		return this.getAttribute('sitekey');

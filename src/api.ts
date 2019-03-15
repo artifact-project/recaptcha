@@ -42,7 +42,7 @@ declare global {
 	}
 }
 
-const defaultParams: Partial<ReCaptchaWidgetParams> = {
+export const defaultParams: Partial<ReCaptchaWidgetParams> = {
 	lang: 'en',
 	type: 'image',
 	theme: 'light',
