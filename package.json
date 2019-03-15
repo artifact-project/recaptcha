@@ -1,6 +1,6 @@
 {
   "name": "@artifact-project/recaptcha",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "reCAPTCHA API & Components",
   "main": "index.ts",
   "scripts": {
@@ -22,25 +22,19 @@
     "vue",
     "web-component"
   ],
-
   "files": [
     "*.js",
     "*.d.ts",
-
     "react/*.js",
     "react/*.d.ts",
-
     "vue/*.js",
     "vue/*.vue",
     "vue/*.d.ts",
-
     "web-component/*.js",
     "web-component/*.d.ts",
-
     "src/*.js",
     "src/*.d.ts"
   ],
-
   "author": "RubaXa <trash@rubaxa.org>",
   "license": "MIT",
   "devDependencies": {
