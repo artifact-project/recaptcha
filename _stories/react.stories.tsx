@@ -8,9 +8,16 @@ import {
 	ReCaptchaContextMock,
 } from '../react';
 import { ReCaptchaLang } from '../src/api';
+import { createReCaptchaAnalytics } from '../analytics';
+import { system } from '@perf-tools/keeper';
 
 const V2_KEY = '6LdfVpcUAAAAAJ9h8NiRbklJWcGF1akc5orZU4I_';
 const V2_INVISIBLE_KEY = '6LehTZcUAAAAAAaj7CjzWJ2wDRSS8eXN6km6FSkz'
+
+const analytics = createReCaptchaAnalytics('StoryBook', {
+	keeper: system,
+});
+
 
 const ReCaptcha = (props: Partial<ReCaptchaProps> = {}) => <BaseReCaptcha
 	sitekey={V2_KEY}
@@ -18,15 +25,23 @@ const ReCaptcha = (props: Partial<ReCaptchaProps> = {}) => <BaseReCaptcha
 	onChange={action('change')}
 	onExpired={action('expired')}
 	onError={action('error')}
-	onChallengeShow={action('Challenge.Show')}
-	onChallengeHide={action('Challenge.Hide')}
-	onStartAttempt={action('Attempt.Start')}
-	onAttempt={action('Attempt.Resolved')}
+
+	{...analytics.mixin('react', {
+		onChallengeShow: action('Challenge.Show'),
+		onChallengeHide: action('Challenge.Hide'),
+		onStartAttempt: action('Attempt.Start'),
+		onAttempt: action('Attempt.Resolved'),
+	})}
+
 	{...props}
 />;
 
 storiesOf('React', module)
-	.add('default', () => <ReCaptcha/>)
+	.add('default', () => <form onSubmit={(evt) => evt.preventDefault()}>
+		<ReCaptcha/>
+		<br/><br/><br/>
+		<button type="submit">Submit for sending analytics (see console)</button>
+	</form>)
 	.add('theme: light (default)', () => <ReCaptcha/>)
 	.add('theme: dark', () => <ReCaptcha theme="dark"/>)
 	.add('loading', () => <ReCaptcha
