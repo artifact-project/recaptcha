@@ -18,6 +18,10 @@ const ReCaptcha = (props: Partial<ReCaptchaProps> = {}) => <BaseReCaptcha
 	onChange={action('change')}
 	onExpired={action('expired')}
 	onError={action('error')}
+	onChallengeShow={action('Challenge.Show')}
+	onChallengeHide={action('Challenge.Hide')}
+	onStartAttempt={action('Attempt.Start')}
+	onAttempt={action('Attempt.Resolved')}
 	{...props}
 />;
 

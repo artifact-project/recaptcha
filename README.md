@@ -13,12 +13,13 @@ npm i --save-dev @artifact-project/recaptcha
  - API 🛠
  - Multi language 🇷🇺🇺🇸🇨🇳
  - Support mock for testing 🔬
+ - Events 💡
  - Components
-   - [Vue](https://artifact-project.github.io/recaptcha/?path=/story/vue--default) (in progress)
-   - [WebComponent](https://artifact-project.github.io/recaptcha/?path=/story/webcomponent--default) (in progress)
    - [React](https://artifact-project.github.io/recaptcha/?path=/story/react--default) (ready to use)
      - Server side render
      - Dynamic properties
+   - [Vue](https://artifact-project.github.io/recaptcha/?path=/story/vue--default) (in progress, help wanted)
+   - [WebComponent](https://artifact-project.github.io/recaptcha/?path=/story/webcomponent--default) (in progress, help wanted)
 
 ---
 
@@ -42,6 +43,16 @@ const widget = renderReCaptchaWidget({
 		console.log('type:', type); // Enum('change', 'expired', 'error')
 		console.log('code:', code); // 'XXXX' or null
 	},
+
+	// Events
+	onchallengeshow() {},
+	onchallengehide() {},
+	onstartattempt(attempt) {
+		console.log('attempt.start:', attempt); // {state: 'start', start: 132314124, duration: 0};
+	},
+	onattempt(attempt) {
+		console.log('attempt.resolved:', attempt); // {state: 'verified', start: 132314124, duration: 325325};
+	},
 });
 
 // As React Compomnent
@@ -55,6 +66,11 @@ const captcha = (
 		onChange={(code) => console.log('reCAPTCHA code:', code)}
 		onExpired={(code) => { /* ... */ }}
 		onError={(err) => { /* ... */ }}
+
+		onChallengeShow={() => { /* ... */ }}
+		onChallengeHide={() => { /* ... */ }}
+		onStartAttempt={(attempt) => { /* ... */ }}
+		onAttempt={(attempt) => { /* ... */ }}
 	/>
 );
 ```

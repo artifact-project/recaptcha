@@ -20,7 +20,7 @@ export type ReCaptchaWidgetCallbacks = {
 
 export type ReCaptchaWidgetOptions = ReCaptchaWidgetParams & ReCaptchaWidgetCallbacks & {
 	hl?: ReCaptchaLanguageCodes;
-};
+}
 
 export type ReCaptchaWidget = {
 	id: string;
@@ -40,6 +40,24 @@ declare global {
 	interface Window {
 		grecaptcha: ReCaptchaSDK;
 	}
+}
+
+const globalThis = Function('return this')() as Window;
+
+export type ReCatpchaAttempt = {
+	state: 'start' | 'verified' | 'expired' | 'cancelled' | 'error' | 'reset';
+	start: number;
+	duration: number;
+};
+
+export type ReCaptchaWidgetCfg = {
+	el: HTMLElement;
+	params: ReCaptchaWidgetParams;
+	handle: (type: 'change' | 'expired' | 'error', code: string | null, error: any) => void;
+	onchallengeshow?: () => void;
+	onchallengehide?: () => void;
+	onstartattempt?: (attempt: ReCatpchaAttempt) => void;
+	onattempt?: (attempt: ReCatpchaAttempt) => void;
 }
 
 export const defaultParams: Partial<ReCaptchaWidgetParams> = {
@@ -72,7 +90,7 @@ export function installReCaptchaSDK() {
 		const script = document.createElement('script');
 		const src = `https://www.google.com/recaptcha/api.js?onload=${expando}&render=explicit`;
 
-		window.grecaptcha = undefined;
+		globalThis.grecaptcha = undefined;
 
 		script.type = 'text/javascript';
 		script.async = true;
@@ -84,24 +102,20 @@ export function installReCaptchaSDK() {
 
 		head.appendChild(script);
 
-		(window as any)[expando] = () => {
-			resolve(window.grecaptcha);
-			window.grecaptcha = undefined;
-			(window as any)[expando] = null;
+		(globalThis as any)[expando] = () => {
+			resolve(globalThis.grecaptcha);
+			globalThis.grecaptcha = undefined;
+			(globalThis as any)[expando] = null;
 		};
 
 		setTimeout(() => {
 			reject(new Error('[recaptcha] Install Failed: timeout'));
-			(window as any)[expando] = null;
+			(globalThis as any)[expando] = null;
 		}, 30000);
 	});
 }
 
-export function renderReCaptchaWidget(cfg: {
-	el: HTMLElement;
-	params: ReCaptchaWidgetParams;
-	handle: (type: 'change' | 'expired' | 'error', code: string | null, error: any) => void;
-}): ReCaptchaWidget {
+export function renderReCaptchaWidget(cfg: ReCaptchaWidgetCfg): ReCaptchaWidget {
 	let id: string = null;
 	let code: string = null;
 	let disposed = false;
@@ -111,13 +125,17 @@ export function renderReCaptchaWidget(cfg: {
 		widgetResolve = resolve;
 		widgetReject = reject;
 	});
-
+	const {
+		challengeObserver,
+		resolveAttempt,
+	} = createChallengeObserver(cfg);
 	const widget: ReCaptchaWidget = {
 		id: null,
 		ready: widgetReady,
 		getResponse: () => code,
 		reset: () => {},
 		dispose: () => {
+			challengeObserver.dispose()
 			disposed = true;
 		},
 	};
@@ -125,6 +143,8 @@ export function renderReCaptchaWidget(cfg: {
 		...defaultParams,
 		...cfg.params,
 	};
+
+	challengeObserver.start();
 
 	installReCaptchaSDK()
 		.then((recaptcha) => {
@@ -138,32 +158,128 @@ export function renderReCaptchaWidget(cfg: {
 
 				callback() {
 					code = recaptcha.getResponse(id);
+					resolveAttempt('verified');
 					cfg.handle('change', code, null);
 				},
 
 				'expired-callback'() {
 					code = null;
+					resolveAttempt('expired');
 					cfg.handle('expired', code, null);
 				},
 
 				'error-callback'(err: any) {
 					code = null;
+					resolveAttempt('error');
 					cfg.handle('error', null, err);
 				},
 			});
 
 			widget.id = id;
 			widget.reset = () => {
+				resolveAttempt('reset');
+				challengeObserver.reset();
 				recaptcha.reset(id);
 			};
 
 			widgetResolve(widget);
 		})
 		.catch((reason) => {
+			resolveAttempt('error');
 			cfg.handle('error', null, reason);
 			widgetReject(reason);
 		})
 	;
 
 	return widget;
+}
+
+function noop() {
+}
+
+function createChallengeObserver(cfg: ReCaptchaWidgetCfg) {
+	try {
+		let attempt = null as ReCatpchaAttempt
+		let challengeLock = false;
+		let challenge = null as HTMLElement;
+		let challengeVisible = false;
+
+		const resolveAttempt = (state: ReCatpchaAttempt['state']) => {
+			if (attempt && (state !== 'cancelled' || attempt.state === 'start')) {
+				attempt.duration = Date.now() - attempt.start;
+				attempt.state = state;
+				(cfg.onattempt || noop)(attempt);
+			}
+		};
+
+		const challengeChanged = () => {
+			challengeLock = false;
+
+			if (challenge) {
+				const visible = !(parseInt(challenge.style.top) < 0);
+				if (visible !== challengeVisible) {
+					challengeVisible = visible;
+
+					if (visible) {
+						attempt = {
+							state: 'start',
+							start: Date.now(),
+							duration: 0,
+						};
+						(cfg.onstartattempt || noop)(attempt);
+					} else {
+						resolveAttempt('cancelled');
+					}
+
+					(cfg[visible ? 'onchallengeshow' : 'onchallengehide'] || noop)();
+				}
+			} else {
+				challenge = document.querySelector('iframe[title*="challenge"][src*="/recaptcha/api2/"]');
+
+				if (challenge) {
+					while (!(parseInt(challenge.style.top) < 0)) {
+						challenge = challenge.parentElement;
+					}
+
+					challengeObserver.disconnect();
+					challengeObserver.observe(challenge, {attributes: true});
+				}
+			}
+		};
+
+		const challengeObserver = new MutationObserver(() => {
+			if (!challengeLock) {
+				challengeLock = true;
+				requestAnimationFrame(challengeChanged);
+			}
+		});
+
+		return {
+			resolveAttempt,
+			challengeObserver: {
+				start() {
+					challengeObserver.observe(document, {childList: true, subtree: true});
+				},
+
+				dispose() {
+					challenge = null;
+					challengeObserver.disconnect();
+				},
+
+				reset() {
+					this.dispose();
+					this.start();
+				},
+			},
+		};
+	} catch (_) {
+		return {
+			resolveAttempt: noop,
+			challengeObserver: {
+				start: noop,
+				dispose: noop,
+				reset: noop,
+			},
+		};
+	}
 }

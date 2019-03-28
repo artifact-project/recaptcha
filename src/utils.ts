@@ -1,4 +1,4 @@
-import { ReCaptchaWidgetParams } from './api';
+import { ReCaptchaWidgetParams, ReCatpchaAttempt } from './api';
 
 export interface ReCaptchaProps extends ReCaptchaWidgetParams {
 	loading?: React.ReactNode;
@@ -9,6 +9,10 @@ export interface ReCaptchaProps extends ReCaptchaWidgetParams {
 	onChange?: (code: string) => void;
 	onExpired?: () => void;
 	onError?: (err: Error) => void;
+	onChallengeShow?: () => void
+	onChallengeHide?: () => void
+	onStartAttempt?: (attempt: ReCatpchaAttempt) => void
+	onAttempt?: (attempt: ReCatpchaAttempt) => void
 }
 
 export function getWidgetParams(props: ReCaptchaWidgetParams): ReCaptchaWidgetParams {
