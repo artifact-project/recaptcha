@@ -73,6 +73,11 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 				onChange,
 				onExpired,
 				onError,
+
+				onChallengeShow,
+				onChallengeHide,
+				onStartAttempt,
+				onAttempt,
 			} = props;
 
 			this._widget = renderReCaptchaWidget({
@@ -83,6 +88,11 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 					(type === 'expired') && onExpired && onExpired();
 					(type === 'error') && onError && onError(err);
 				},
+
+				onchallengeshow: onChallengeShow,
+				onchallengehide: onChallengeHide,
+				onstartattempt: onStartAttempt,
+				onattempt: onAttempt,
 			});
 		}
 	}
