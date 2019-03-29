@@ -34,10 +34,20 @@ declare global {
         grecaptcha: ReCaptchaSDK;
     }
 }
-export declare const defaultParams: Partial<ReCaptchaWidgetParams>;
-export declare function installReCaptchaSDK(): Promise<ReCaptchaSDK>;
-export declare function renderReCaptchaWidget(cfg: {
+export declare type ReCatpchaAttempt = {
+    state: 'start' | 'verified' | 'expired' | 'cancelled' | 'error' | 'reset';
+    start: number;
+    duration: number;
+};
+export declare type ReCaptchaWidgetCfg = {
     el: HTMLElement;
     params: ReCaptchaWidgetParams;
     handle: (type: 'change' | 'expired' | 'error', code: string | null, error: any) => void;
-}): ReCaptchaWidget;
+    onchallengeshow?: () => void;
+    onchallengehide?: () => void;
+    onstartattempt?: (attempt: ReCatpchaAttempt) => void;
+    onattempt?: (attempt: ReCatpchaAttempt) => void;
+};
+export declare const defaultParams: Partial<ReCaptchaWidgetParams>;
+export declare function installReCaptchaSDK(): Promise<ReCaptchaSDK>;
+export declare function renderReCaptchaWidget(cfg: ReCaptchaWidgetCfg): ReCaptchaWidget;
