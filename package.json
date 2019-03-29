@@ -1,6 +1,6 @@
 {
   "name": "@artifact-project/recaptcha",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "reCAPTCHA API & Components",
   "main": "index.ts",
   "scripts": {
@@ -62,6 +62,5 @@
     "vue": ">=2.6.9",
     "react": ">=16"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
