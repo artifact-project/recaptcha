@@ -135,7 +135,7 @@ export function renderReCaptchaWidget(cfg: ReCaptchaWidgetCfg): ReCaptchaWidget 
 		getResponse: () => code,
 		reset: () => {},
 		dispose: () => {
-			challengeObserver.dispose()
+			challengeObserver.dispose();
 			disposed = true;
 		},
 	};
@@ -164,12 +164,14 @@ export function renderReCaptchaWidget(cfg: ReCaptchaWidgetCfg): ReCaptchaWidget 
 
 				'expired-callback'() {
 					code = null;
+					challengeObserver.reset();
 					resolveAttempt('expired');
 					cfg.handle('expired', code, null);
 				},
 
 				'error-callback'(err: any) {
 					code = null;
+					challengeObserver.reset();
 					resolveAttempt('error');
 					cfg.handle('error', null, err);
 				},
@@ -228,7 +230,7 @@ function createChallengeObserver(cfg: ReCaptchaWidgetCfg) {
 						};
 						(cfg.onstartattempt || noop)(attempt);
 					} else {
-						resolveAttempt('cancelled');
+						setTimeout(resolveAttempt, 50, 'cancelled');
 					}
 
 					(cfg[visible ? 'onchallengeshow' : 'onchallengehide'] || noop)();
@@ -250,7 +252,7 @@ function createChallengeObserver(cfg: ReCaptchaWidgetCfg) {
 		const challengeObserver = new MutationObserver(() => {
 			if (!challengeLock) {
 				challengeLock = true;
-				requestAnimationFrame(challengeChanged);
+				setTimeout(challengeChanged, 50);
 			}
 		});
 

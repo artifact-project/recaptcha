@@ -13,7 +13,7 @@ npm i --save-dev @artifact-project/recaptcha
  - API 🛠
  - Multi language 🇷🇺🇺🇸🇨🇳
  - Support mock for testing 🔬
- - Events 💡
+ - Events💡& [Analytics](#analytics) 📊(support ⚡️[@perf-tools/keeper](https://github.com/artifact-project/perf-tools/tree/master/keeper))
  - Components
    - [React](https://artifact-project.github.io/recaptcha/?path=/story/react--default) (ready to use)
      - Server side render
@@ -120,3 +120,46 @@ const captchaWithMock = (
 	</ReCaptchaContextMock.Provider>
 );
 ```
+
+---
+
+<a name="analytics"></a>
+
+### Analytics
+
+```ts
+import { renderReCaptchaWidget } from '@artifact-project/recaptcha';
+import { createReCaptchaAnalytics } from '@artifact-project/recaptcha/analytics';
+
+const analytics = createReCaptchaAnalytics('LoginPage');
+
+renderReCaptchaWidget({
+	el: document.getElementById('captcha-box'),
+	params: { /*...*/ },
+	...analytics.mixin('native'), // added `on`-props
+});
+
+document.getElementById('login-form').addEventListener('submit', () => {
+	const stats = analytics.get();
+
+	sendToMyAnalytics(analytics.name, stats);
+	analytics.clear();
+
+	// ...
+});
+```
+
+#### Using with ⚡️[@perf-tools/keeper](https://github.com/artifact-project/perf-tools/
+
+```ts
+import { system as systemKepper } from '@perf-tools/keeper';
+import { createReCaptchaAnalytics } from '@artifact-project/recaptcha/analytics';
+
+const analytics = createReCaptchaAnalytics('Login', {
+	keeper: systemKepper,
+});
+
+// ... bla-bla-bla
+```
+
+![Analytics in keeper](https://habrastorage.org/webt/vy/hk/7y/vyhk7y0gkcamxykvtfdivmc2hdg.png)

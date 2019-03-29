@@ -39,6 +39,7 @@
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.3.4",
+    "@perf-tools/keeper": "^1.1.1",
     "@storybook/addon-actions": "^5.0.1",
     "@storybook/addon-links": "^5.0.1",
     "@storybook/addons": "^5.0.1",
@@ -57,9 +58,10 @@
   },
   "peerDependencies": {
     "@types/react": ">=16",
+    "@perf-tools/keeper": "*",
+    "vue": ">=2.6.9",
     "react": ">=16"
   },
   "dependencies": {
-    "vue": "^2.6.9"
   }
 }
