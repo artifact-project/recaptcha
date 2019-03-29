@@ -51,6 +51,7 @@ export function createReCaptchaAnalytics<N extends string>(
 	const onAttempt = (attempt: ReCatpchaAttempt) => {
 		if (timer) {
 			timer.stop();
+			timer.parent.add(`try_${attempt.state}`, attempt.start, attempt.start + attempt.duration);
 			timer.parent.stop();
 			timer.parent.parent.stop();
 			timer = undefined;
@@ -99,9 +100,9 @@ export function createReCaptchaAnalytics<N extends string>(
 				group.add('attempts', 0, count);
 
 				group.unit = 'ms';
-				group.add('dur_min', 0, min);
-				group.add('dur_max', 0, max);
-				group.add('dur_avg', 0, avg / count);
+				group.add('time_min', 0, min);
+				group.add('time_max', 0, max);
+				group.add('time_avg', 0, avg / count);
 
 				group.stop(max);
 				group.parent.stop(max);

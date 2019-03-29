@@ -162,4 +162,4 @@ const analytics = createReCaptchaAnalytics('Login', {
 // ... bla-bla-bla
 ```
 
-![Result](https://habrastorage.org/webt/dh/nv/vi/dhnvvixmyyhxm8o-rboximarxfy.png)
+![Analytics in keeper](https://habrastorage.org/webt/vy/hk/7y/vyhk7y0gkcamxykvtfdivmc2hdg.png)
