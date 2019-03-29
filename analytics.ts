@@ -53,6 +53,7 @@ export function createReCaptchaAnalytics<N extends string>(
 			timer.stop();
 			timer.parent.stop();
 			timer.parent.parent.stop();
+			timer = undefined;
 		}
 		stats[attempt.state]++;
 	};
