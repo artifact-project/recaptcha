@@ -149,7 +149,7 @@ document.getElementById('login-form').addEventListener('submit', () => {
 });
 ```
 
-#### Using with ⚡️[@perf-tools/keeper](https://github.com/artifact-project/perf-tools/
+#### Using with ⚡️[@perf-tools/keeper](https://github.com/artifact-project/perf-tools/)
 
 ```ts
 import { system as systemKepper } from '@perf-tools/keeper';
