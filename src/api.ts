@@ -206,8 +206,21 @@ function createChallengeObserver(cfg: ReCaptchaWidgetCfg) {
 		let challenge = null as HTMLElement;
 		let challengeVisible = false;
 
+		const startAttempt = (start: number) => {
+			attempt = {
+				state: 'start',
+				start,
+				duration: 0,
+			};
+			(cfg.onstartattempt || noop)(attempt);
+		};
+
 		const resolveAttempt = (state: ReCatpchaAttempt['state']) => {
-			if (attempt && (state !== 'cancelled' || attempt.state === 'start')) {
+			if (!attempt || attempt.state !== 'start' && state === 'verified') {
+				startAttempt(Date.now() - 1000);
+			}
+
+			if (state !== 'cancelled' || attempt.state === 'start') {
 				attempt.duration = Date.now() - attempt.start;
 				attempt.state = state;
 				(cfg.onattempt || noop)(attempt);
@@ -223,12 +236,7 @@ function createChallengeObserver(cfg: ReCaptchaWidgetCfg) {
 					challengeVisible = visible;
 
 					if (visible) {
-						attempt = {
-							state: 'start',
-							start: Date.now(),
-							duration: 0,
-						};
-						(cfg.onstartattempt || noop)(attempt);
+						startAttempt(Date.now());
 					} else {
 						setTimeout(resolveAttempt, 50, 'cancelled');
 					}
