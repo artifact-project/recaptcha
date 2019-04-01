@@ -53,6 +53,7 @@
     "react": "^16.8.2",
     "ts-jest": "^23.10.5",
     "typescript": "^3.3.3",
+    "vue": "^2.6.10",
     "vue-loader": "^15.7.0",
     "vue-template-compiler": "^2.6.9"
   },
