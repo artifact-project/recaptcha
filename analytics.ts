@@ -8,7 +8,17 @@ export type ReCaptchaAnalyticsOptions = {
 	keeperSendBySubmit?: boolean;
 }
 
-export type ReCaptchaAnalytics = Record<
+export type ReCaptchaAnalytics<N extends string> = {
+	name: N;
+	clear: () => void;
+	get: () => ReCaptchaAnalyticsStats;
+	mixin<
+		K extends keyof ReCaptchaAnalyticsMixin,
+		R extends ReCaptchaAnalyticsMixin[K],
+	>(type: K, override?: Partial<R>): R;
+}
+
+export type ReCaptchaAnalyticsStats = Record<
 	Exclude<ReCatpchaAttempt['state'] | 'show' | 'hide', 'start'>,
 	number
 > & {
@@ -34,8 +44,8 @@ export type ReCaptchaAnalyticsMixin = {
 export function createReCaptchaAnalytics<N extends string>(
 	name: N,
 	options: ReCaptchaAnalyticsOptions = {},
-) {
-	let stats: ReCaptchaAnalytics;
+): ReCaptchaAnalytics<N> {
+	let stats: ReCaptchaAnalyticsStats;
 	let timer: PerfEntry | undefined;
 	const {
 		keeper,

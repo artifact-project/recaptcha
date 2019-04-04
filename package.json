@@ -8,7 +8,8 @@
     "start": "npm run storybook",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook -c .storybook -o ./",
-    "prepublishOnly": "tsc"
+    "prepublishOnly": "tsc",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
