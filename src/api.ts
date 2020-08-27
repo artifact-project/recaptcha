@@ -1,5 +1,11 @@
 import { ReCaptchaLanguageCodes, LanguageLocale, reLang } from './language';
 
+declare global {
+	interface Window {
+		grecaptcha: ReCaptchaSDK;
+	}
+}
+
 export type ReCaptchaLang = ReCaptchaLanguageCodes | LanguageLocale;
 
 export type ReCaptchaWidgetParams = {
@@ -35,14 +41,6 @@ export type ReCaptchaSDK = {
 	getResponse(id: string): string;
 	reset(id: string): void;
 }
-
-declare global {
-	interface Window {
-		grecaptcha: ReCaptchaSDK;
-	}
-}
-
-const globalThis = Function('return this')() as Window;
 
 export type ReCatpchaAttempt = {
 	state: 'start' | 'verified' | 'expired' | 'cancelled' | 'error' | 'reset';
@@ -90,8 +88,8 @@ export function installReCaptchaSDK() {
 		const script = document.createElement('script');
 		const src = `https://www.google.com/recaptcha/api.js?onload=${expando}&render=explicit`;
 
-		globalThis.grecaptcha = undefined;
-
+		window.grecaptcha = undefined;
+		
 		script.type = 'text/javascript';
 		script.async = true;
 		script.defer = true;
@@ -99,18 +97,16 @@ export function installReCaptchaSDK() {
 			reject(new Error('[recaptcha] Install Failed: net error'));
 		};
 		script.src = src;
-
 		head.appendChild(script);
 
-		(globalThis as any)[expando] = () => {
-			resolve(globalThis.grecaptcha);
-			globalThis.grecaptcha = undefined;
-			(globalThis as any)[expando] = null;
+		window[expando] = () => {
+			resolve(window.grecaptcha);
+			window.grecaptcha = undefined;
 		};
 
 		setTimeout(() => {
 			reject(new Error('[recaptcha] Install Failed: timeout'));
-			(globalThis as any)[expando] = null;
+			window[expando] = null;
 		}, 30000);
 	});
 }
