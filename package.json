@@ -8,7 +8,7 @@
     "start": "npm run storybook",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook -c .storybook -o ./",
-    "prepublishOnly": "tsc",
+    "prepublishOnly": "tsc && webpack",
     "postversion": "git push && git push --tags"
   },
   "repository": {
@@ -46,17 +46,19 @@
     "@storybook/addons": "^5.0.6",
     "@storybook/react": "^5.0.6",
     "@types/jest": "^24.0.5",
-    "@types/node": "^11.11.3",
+    "@types/node": "^13.13.15",
     "@types/react": "^16.8.3",
     "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "^8.0.5",
     "jest": "^24.1.0",
     "react": "^16.8.2",
     "ts-jest": "^23.10.5",
-    "typescript": "^3.3.3",
+    "typescript": "^3.9.7",
     "vue": "^2.6.10",
     "vue-loader": "^15.7.0",
-    "vue-template-compiler": "^2.6.9"
+    "vue-template-compiler": "^2.6.9",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^4.0.0-beta.2"
   },
   "peerDependencies": {
     "@types/react": ">=16",
