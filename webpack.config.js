@@ -6,9 +6,9 @@ module.exports = {
 
 	output: {
 		path: __dirname,
-		filename: 'recaptcha.commonjs.js',
+		filename: 'recaptcha.umd.js',
 		library: 'recaptcha',
-		libraryTarget: 'commonjs',
+		libraryTarget: 'umd',
 	},
 
 	module: {
