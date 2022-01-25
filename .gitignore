@@ -64,3 +64,4 @@ typings/
 dist
 compiled
 package-lock.json
+.idea

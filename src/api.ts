@@ -2,7 +2,7 @@ import { ReCaptchaLanguageCodes, LanguageLocale, reLang } from './language';
 
 declare global {
 	interface Window {
-		grecaptcha: ReCaptchaSDK;
+		grecaptcha: ReCaptchaSDK & EnterpriseReCaptchaSDK;
 	}
 }
 
@@ -16,6 +16,7 @@ export type ReCaptchaWidgetParams = {
 	theme?: 'dark' | 'light';
 	size?: 'compact' | 'normal' | 'invisible';
 	badge?: 'bottomright' | 'bottomleft' | 'inline';
+	isEnterprise?: boolean;
 }
 
 export type ReCaptchaWidgetCallbacks = {
@@ -42,6 +43,10 @@ export type ReCaptchaSDK = {
 	reset(id: string): void;
 }
 
+export type EnterpriseReCaptchaSDK = {
+	enterprise: ReCaptchaSDK;
+};
+
 export type ReCatpchaAttempt = {
 	state: 'start' | 'verified' | 'expired' | 'cancelled' | 'error' | 'reset';
 	start: number;
@@ -64,6 +69,7 @@ export const defaultParams: Partial<ReCaptchaWidgetParams> = {
 	theme: 'light',
 	size: 'normal',
 	badge: 'bottomright',
+	isEnterprise: false,
 };
 
 let installPromise: Promise<ReCaptchaSDK>;
@@ -81,15 +87,16 @@ function getPromise(
 	return installPromise;
 }
 
-export function installReCaptchaSDK() {
+export function installReCaptchaSDK(isEnterprise?: boolean) {
 	return getPromise((resolve, reject) => {
 		const expando = `__recaptcha_${Date.now()}`;
 		const head = document.getElementsByTagName('head')[0];
 		const script = document.createElement('script');
-		const src = `https://www.google.com/recaptcha/api.js?onload=${expando}&render=explicit`;
+		const scriptName = isEnterprise ? 'enterprise' : 'api';
+		const src = `https://www.google.com/recaptcha/${scriptName}.js?onload=${expando}&render=explicit`;
 
 		window.grecaptcha = undefined;
-		
+
 		script.type = 'text/javascript';
 		script.async = true;
 		script.defer = true;
@@ -100,7 +107,8 @@ export function installReCaptchaSDK() {
 		head.appendChild(script);
 
 		window[expando] = () => {
-			resolve(window.grecaptcha);
+			const grecaptcha = isEnterprise ? window.grecaptcha.enterprise : window.grecaptcha;
+			resolve(grecaptcha);
 			window.grecaptcha = undefined;
 		};
 
@@ -142,7 +150,7 @@ export function renderReCaptchaWidget(cfg: ReCaptchaWidgetCfg): ReCaptchaWidget 
 
 	challengeObserver.start();
 
-	installReCaptchaSDK()
+	installReCaptchaSDK(widgetParams.isEnterprise)
 		.then((recaptcha) => {
 			if (disposed) {
 				return;
