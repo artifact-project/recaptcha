@@ -63,5 +63,4 @@ typings/
 # Distributive
 dist
 compiled
-package-lock.json
 .idea
