@@ -90,12 +90,40 @@ installReCaptchaSDK().then(() => {
 });
 
 renderReCaptchaWidget({ ... }).ready.then(widget => {
-	console.lof('reCAPTCHA SDK —> loaded');
-	console.lof('reCAPTCHA Widget —> rendered');
+	console.log('reCAPTCHA SDK —> loaded');
+	console.log('reCAPTCHA Widget —> rendered');
 })
 ```
 
 ---
+
+### Enterprise recaptcha
+
+Чтобы подключить enterprise версию рекаптчи, необходимо передать `isEnterprise` флаг.
+
+```tsx
+// As API
+import { renderReCaptchaWidget } from '@artifact-project/recaptcha';
+
+const widget = renderReCaptchaWidget({
+	params: {
+		sitekey: 'XXXX',
+		theme: 'dark',
+		isEnterprise: true
+	},
+    ...
+});
+
+// As React Compomnent
+import { ReCaptcha } from '@artifact-project/recaptcha/react';
+
+const captcha = (
+	<ReCaptcha
+		sitekey={'XXXX'}
+		isEnterprise
+	/>
+);
+```
 
 ### Testing / Mock
 
