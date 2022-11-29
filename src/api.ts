@@ -248,15 +248,15 @@ function createChallengeObserver(cfg: ReCaptchaWidgetCfg) {
 					(cfg[visible ? 'onchallengeshow' : 'onchallengehide'] || noop)();
 				}
 			} else {
-				challenge = document.querySelector('iframe[title*="challenge"][src*="/recaptcha/api2/"]');
+				challenge = document.querySelector('[src*="recaptcha/api2/bframe"]') || document.querySelector('iframe[title*="challenge"][src*="/recaptcha/api2/"]');
 
 				if (challenge) {
-					while (!(parseInt(challenge.style.top) < 0)) {
+					while (!(parseInt(challenge.style.top) < 0) && challenge.parentElement.tagName !== 'BODY') {
 						challenge = challenge.parentElement;
 					}
 
 					challengeObserver.disconnect();
-					challengeObserver.observe(challenge, {attributes: true});
+					challengeObserver.observe(challenge, {attributes: true, attributeFilter: ['style'] });
 				}
 			}
 		};
