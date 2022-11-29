@@ -256,7 +256,7 @@ function createChallengeObserver(cfg: ReCaptchaWidgetCfg) {
 					}
 
 					challengeObserver.disconnect();
-					challengeObserver.observe(challenge, {attributes: true});
+					challengeObserver.observe(challenge, {attributes: true, attributeFilter: ["style"]});
 				}
 			}
 		};
