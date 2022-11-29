@@ -251,7 +251,7 @@ function createChallengeObserver(cfg: ReCaptchaWidgetCfg) {
 				challenge = document.querySelector('iframe[title*="текущую проверку reCAPTCHA можно пройти в течение ещё двух минут"][src*="/recaptcha/api2/"]');
 
 				if (challenge) {
-					while (!(parseInt(challenge.style.top) < 0)) {
+					if (!(parseInt(challenge.style.top) < 0)) {
 						challenge = challenge.parentElement.parentElement;
 					}
 
