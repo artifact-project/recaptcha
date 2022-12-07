@@ -231,33 +231,51 @@ function createChallengeObserver(cfg: ReCaptchaWidgetCfg) {
 			}
 		};
 
+		const checkChallengeElement = () => {
+			if (challenge) {
+				return;
+			}
+
+			challenge = document.querySelector('[src*="recaptcha/api2/bframe"]')
+				|| document.querySelector('iframe[title*="challenge"][src*="/recaptcha/api2/"]');
+
+			if (!challenge) {
+				return;
+			}
+
+			while (!(parseInt(challenge.style.top) < 0) && challenge.parentElement.tagName !== 'BODY') {
+				challenge = challenge.parentElement;
+			}
+
+			challengeObserver.disconnect();
+			challengeObserver.observe(challenge, {attributes: true, attributeFilter: ['style'] });
+		};
+
+		const checkChallengeVisibilityState = () => {
+			const visible = !(parseInt(challenge.style.top) < 0);
+			if (visible === challengeVisible) {
+				return;
+			}
+
+			challengeVisible = visible;
+
+			if (visible) {
+				startAttempt(Date.now());
+				(cfg.onchallengeshow || noop)();
+			} else {
+				setTimeout(resolveAttempt, 50, 'cancelled');
+				challenge = null;
+				(cfg.onchallengehide || noop)();
+			}
+		};
+
 		const challengeChanged = () => {
 			challengeLock = false;
+			
+			checkChallengeElement();
 
 			if (challenge) {
-				const visible = !(parseInt(challenge.style.top) < 0);
-				if (visible !== challengeVisible) {
-					challengeVisible = visible;
-
-					if (visible) {
-						startAttempt(Date.now());
-					} else {
-						setTimeout(resolveAttempt, 50, 'cancelled');
-					}
-
-					(cfg[visible ? 'onchallengeshow' : 'onchallengehide'] || noop)();
-				}
-			} else {
-				challenge = document.querySelector('[src*="recaptcha/api2/bframe"]') || document.querySelector('iframe[title*="challenge"][src*="/recaptcha/api2/"]');
-
-				if (challenge) {
-					while (!(parseInt(challenge.style.top) < 0) && challenge.parentElement.tagName !== 'BODY') {
-						challenge = challenge.parentElement;
-					}
-
-					challengeObserver.disconnect();
-					challengeObserver.observe(challenge, {attributes: true, attributeFilter: ['style'] });
-				}
+				checkChallengeVisibilityState();
 			}
 		};
 
