@@ -232,7 +232,7 @@ function createChallengeObserver(cfg: ReCaptchaWidgetCfg) {
 		};
 
 		const checkChallengeElement = () => {
-			if (!challenge) {
+			if (challenge) {
 				return;
 			}
 
