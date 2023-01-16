@@ -48,6 +48,10 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 		});
 	}
 
+	public reset() {
+		this._widget.reset();
+	}
+
 	private _reset() {
 		if (this._widget) {
 			this._widget.reset();
