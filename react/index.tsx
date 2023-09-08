@@ -48,7 +48,15 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 		});
 	}
 
-	private _reset() {
+	public reset() {
+		try {
+			this._widget && this._widget.reset();
+		} catch (err) {
+			console.error('Error while trying to manually reset recaptcha', err);
+		}
+	}
+
+	private _dispose() {
 		if (this._widget) {
 			this._widget.reset();
 			this._widget.dispose();
@@ -60,7 +68,7 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 
 	private _updRefHost = (el: HTMLElement) => {
 		if (this._hostRef !== el && canUseDOM) {
-			this._reset();
+			this._dispose();
 
 			if (!el) {
 				return;
