@@ -51,8 +51,8 @@ class ReCaptcha extends React.PureComponent<ReCaptchaProps> {
 	public reset() {
 		try {
 			this._widget && this._widget.reset();
-		} catch (e) {
-			console.error('Error while trying to manually reset recaptcha', e);
+		} catch (err) {
+			console.error('Error while trying to manually reset recaptcha', err);
 		}
 	}
 
