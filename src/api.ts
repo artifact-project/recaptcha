@@ -235,6 +235,19 @@ function createChallengeObserver(cfg: ReCaptchaWidgetCfg) {
 			challengeLock = false;
 
 			if (challenge) {
+				let elementsChallengeContainer = challenge.querySelectorAll('[style*="z-index: 2000000000"]') as NodeListOf<HTMLElement>;
+				if (elementsChallengeContainer.length === 0) {
+					elementsChallengeContainer = challenge.querySelectorAll('[style*="z-index"][style*="overflow-y: auto"]');
+				}
+
+				if (elementsChallengeContainer.length !== 0) {
+					const challengeContainer = Array.from(elementsChallengeContainer).find(element => element.children.length > 0);
+
+					if (challengeContainer.style.height) {
+						challengeContainer.style.height = null;
+					}
+				}
+
 				const visible = !(parseInt(challenge.style.top) < 0);
 				if (visible !== challengeVisible) {
 					challengeVisible = visible;
