@@ -57,8 +57,8 @@ export type ReCaptchaWidgetCfg = {
 	el: HTMLElement;
 	params: ReCaptchaWidgetParams;
 	handle: (type: 'change' | 'expired' | 'error', code: string | null, error: any) => void;
-	onchallengeshow?: () => void;
-	onchallengehide?: () => void;
+	onchallengeshow?: (e?: HTMLElement) => void;
+	onchallengehide?: (e?: HTMLElement) => void;
 	onstartattempt?: (attempt: ReCatpchaAttempt) => void;
 	onattempt?: (attempt: ReCatpchaAttempt) => void;
 }
@@ -245,7 +245,7 @@ function createChallengeObserver(cfg: ReCaptchaWidgetCfg) {
 						setTimeout(resolveAttempt, 50, 'cancelled');
 					}
 
-					(cfg[visible ? 'onchallengeshow' : 'onchallengehide'] || noop)();
+					(cfg[visible ? 'onchallengeshow' : 'onchallengehide'] || noop)(challenge);
 				}
 			} else {
 				challenge = document.querySelector('[src*="recaptcha/api2/bframe"]') || document.querySelector('iframe[title*="challenge"][src*="/recaptcha/api2/"]');
