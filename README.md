@@ -45,8 +45,8 @@ const widget = renderReCaptchaWidget({
 	},
 
 	// Events
-	onchallengeshow() {},
-	onchallengehide() {},
+	onchallengeshow(challengeRef) {},
+	onchallengehide(challengeRef) {},
 	onstartattempt(attempt) {
 		console.log('attempt.start:', attempt); // {state: 'start', start: 132314124, duration: 0};
 	},

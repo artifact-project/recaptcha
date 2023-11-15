@@ -57,8 +57,8 @@ export type ReCaptchaWidgetCfg = {
 	el: HTMLElement;
 	params: ReCaptchaWidgetParams;
 	handle: (type: 'change' | 'expired' | 'error', code: string | null, error: any) => void;
-	onchallengeshow?: () => void;
-	onchallengehide?: () => void;
+	onchallengeshow?: (e?: HTMLElement) => void;
+	onchallengehide?: (e?: HTMLElement) => void;
 	onstartattempt?: (attempt: ReCatpchaAttempt) => void;
 	onattempt?: (attempt: ReCatpchaAttempt) => void;
 }
@@ -235,19 +235,6 @@ function createChallengeObserver(cfg: ReCaptchaWidgetCfg) {
 			challengeLock = false;
 
 			if (challenge) {
-				let elementsChallengeContainer = challenge.querySelectorAll('[style*="z-index: 2000000000"]') as NodeListOf<HTMLElement>;
-				if (elementsChallengeContainer.length === 0) {
-					elementsChallengeContainer = challenge.querySelectorAll('[style*="z-index"][style*="overflow-y: auto"]');
-				}
-
-				if (elementsChallengeContainer.length !== 0) {
-					const challengeContainer = Array.from(elementsChallengeContainer).find(element => element.children.length > 0);
-
-					if (challengeContainer.style.height) {
-						challengeContainer.style.height = null;
-					}
-				}
-
 				const visible = !(parseInt(challenge.style.top) < 0);
 				if (visible !== challengeVisible) {
 					challengeVisible = visible;
@@ -258,7 +245,7 @@ function createChallengeObserver(cfg: ReCaptchaWidgetCfg) {
 						setTimeout(resolveAttempt, 50, 'cancelled');
 					}
 
-					(cfg[visible ? 'onchallengeshow' : 'onchallengehide'] || noop)();
+					(cfg[visible ? 'onchallengeshow' : 'onchallengehide'] || noop)(challenge);
 				}
 			} else {
 				challenge = document.querySelector('[src*="recaptcha/api2/bframe"]') || document.querySelector('iframe[title*="challenge"][src*="/recaptcha/api2/"]');
